@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MW - Secure Assistant & Automation</title>
+    <!-- PWA Manifest & Styling -->
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
+        .app-container { width: 100%; max-width: 420px; background: var(--card-bg); border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden; border: 1px solid var(--border-color); }
+        .screen { display: none; padding: 25px; flex-direction: column; gap: 20px; }
+        .screen.active { display: flex; }
+        h1, h2 { text-align: center; color: var(--text-main); }
+        p { color: var(--text-muted); font-size: 14px; text-align: center; }
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-size: 13px; color: var(--text-muted); }
+        input, textarea, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); background: #0f172a; color: var(--text-main); font-size: 15px; outline: none; }
+        input:focus, textarea:focus { border-color: var(--accent-blue); }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn-primary { background: var(--accent-blue); color: white; }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-confirm { background: var(--accent-green); color: white; }
+        .btn-confirm:hover { opacity: 0.9; }
+        .tabs { display: flex; background: #0f172a; border-bottom: 1px solid var(--border-color); }
+        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; font-size: 14px; color: var(--text-muted); border-bottom: 2px solid transparent; }
+        .tab.active { color: var(--accent-blue); border-bottom: 2px solid var(--accent-blue); font-weight: bold; }
+        .chat-box { height: 250px; background: #0f172a; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .message { padding: 10px 14px; border-radius: 10px; max-width: 80%; font-size: 14px; line-height: 1.4; }
+        .message.user { background: var(--accent-blue); color: white; align-self: flex-end; }
+        .message.ai { background: #334155; color: var(--text-main); align-self: flex-start; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- 1. LANDING & INSTALL SCREEN -->
+    <div id="screen-landing" class="screen active">
+        <h1>Welcome to MW</h1>
+        <p>Your secure personal automation & AI assistant hub.</p>
+        <div style="text-align: center; margin: 30px 0;">
+            <div style="font-size: 50px; margin-bottom: 15px;">⚡</div>
+            <p>Native PWA Experience Ready</p>
+        </div>
+        <button class="btn btn-primary" onclick="goToAuth()">Install / Start App (~15MB)</button>
+    </div>
+
+    <!-- 2. AUTHENTICATION (EVERY-TIME 10-DIGIT & DYNAMIC 4-DIGIT OTP) -->
+    <div id="screen-auth" class="screen">
+        <h2>Security Check</h2>
+        <p>Enter your 10-digit mobile number to generate a secure session token.</p>
+        
+        <div id="step-number" class="input-group">
+            <label>Mobile Number (10 Digits)</label>
+            <input type="tel" id="mobile-input" maxlength="10" placeholder="e.g., 9876543210">
+            <button class="btn btn-primary" style="margin-top: 10px;" onclick="requestOTP()">Send Dynamic OTP</button>
+        </div>
+
+        <div id="step-otp" class="input-group" style="display: none;">
+            <label>Enter 4-Digit Dynamic OTP <span id="mock-otp-hint" style="color:var(--accent-green); font-size:12px;"></span></label>
+            <input type="password" id="otp-input" maxlength="4" placeholder="----">
+            <button class="btn btn-confirm" style="margin-top: 10px;" onclick="verifyOTP()">Verify & Enter</button>
+        </div>
+    </div>
+
+    <!-- 3. MAIN DASHBOARD (TABS FOR WHATSAPP & ALL-CHAT) -->
+    <div id="screen-dashboard" class="screen" style="padding: 0;">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('whatsapp')">WhatsApp Sendar</div>
+            <div class="tab" onclick="switchTab('allchat')">All Chat AI</div>
+        </div>
+
+        <!-- TAB 1: WHATSAPP AUTOMATION & SCHEDULING -->
+        <div id="tab-whatsapp" class="tab-content" style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+            <h3>WhatsApp Automation</h3>
+            <div class="input-group">
+                <label>Target WhatsApp Number</label>
+                <input type="tel" id="wa-target" placeholder="Enter Target Number">
+            </div>
+            <div class="input-group">
+                <label>Message Text</label>
+                <textarea id="wa-message" rows="3" placeholder="Type your message here..."></textarea>
+            </div>
+            <div class="input-group">
+                <label>Attach Media (Gallery Photo/Video)</label>
+                <input type="file" id="wa-media" accept="image/*,video/*">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div class="input-group" style="flex:1;">
+                    <label>Schedule Date (Optional)</label>
+                    <input type="date" id="wa-date">
+                </div>
+                <div class="input-group" style="flex:1;">
+                    <label>Schedule Time</label>
+                    <input type="time" id="wa-time">
+                </div>
+            </div>
+            <button class="btn btn-confirm" onclick="triggerWhatsApp()">Save & Confirm Trigger</button>
+        </div>
+
+        <!-- TAB 2: ALL CHAT SMART AI/API DEMAND SECTION -->
+        <div id="tab-allchat" class="tab-content" style="padding: 20px; display: none; flex-direction: column; gap: 15px;">
+            <h3>All Chat Send (AI Engine)</h3>
+            <div class="chat-box" id="chat-container">
+                <div class="message ai">नमस्ते! मैं आपका MW असिस्टेंट हूँ। हिंदी, English, मराठी, Gujarati - किसी भी भाषा में अपनी डिमांड लिखें।</div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="chat-input" placeholder="Type command, question or message..." onkeypress="handleKeyPress(event)">
+                <button class="btn btn-confirm" style="width: 80px;" onclick="sendAllChat()">Send</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- APP STATE & LOCAL STORAGE LOGIC ---
+    let verifiedUserNumber = "";
+    let currentDynamicOTP = "";
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    function goToAuth() {
+        // First-time Handshake simulation with OS/API
+        showScreen('screen-auth');
+    }
+
+    // --- STEP 1: AUTHENTICATION & SECURE NUMBER SAVING ---
+    function requestOTP() {
+        const num = document.getElementById('mobile-input').value;
+        if(num.length !== 10) {
+            alert("कृपया सही 10-डिजिट मोबाइल नंबर दर्ज करें!");
+            return;
+        }
+        verifiedUserNumber = num;
+        
+        // Generate Dynamic 4-Digit OTP (Simulating backend API generation)
+        currentDynamicOTP = Math.floor(1000 + Math.random() * 9000).toString();
+        
+        // Showing hint for demo convenience, in real app it goes via SMS gateway
+        document.getElementById('mock-otp-hint').innerText = `(Test OTP: ${currentDynamicOTP})`;
+        
+        document.getElementById('step-number').style.display = 'none';
+        document.getElementById('step-otp').style.display = 'flex';
+    }
+
+    function verifyOTP() {
+        const enteredOTP = document.getElementById('otp-input').value;
+        if(enteredOTP === currentDynamicOTP) {
+            // Save the verified number locally to system state for further triggers
+            localStorage.setItem("MW_Verified_Number", verifiedUserNumber);
+            alert("ओटीपी वेरीफाई हो गया! ऐप के अंदर स्वागत है।");
+            showScreen('screen-dashboard');
+        } else {
+            alert("गलत ओटीपी! कृपया पुनः प्रयास करें।");
+        }
+    }
+
+    // --- TAB SWITCHING LOGIC ---
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+
+        if(tabName === 'whatsapp') {
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.getElementById('tab-whatsapp').style.display = 'flex';
+        } else {
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.getElementById('tab-allchat').style.display = 'flex';
+        }
+    }
+
+    // --- STEP 2: WHATSAPP TIMED-SCHEDULING & OS INTENT BRIDGE ---
+    function triggerWhatsApp() {
+        const target = document.getElementById('wa-target').value;
+        const msg = document.getElementById('wa-message').value;
+        const date = document.getElementById('wa-date').value;
+        const time = document.getElementById('wa-time').value;
+        const media = document.getElementById('wa-media').files[0];
+
+        if(!target || !msg) {
+            alert("कृपया टारगेट नंबर और मैसेज दोनों भरें!");
+            return;
+        }
+
+        const activeNumber = localStorage.getItem("MW_Verified_Number");
+        
+        // API Payload preparation
+        console.log("API Payload Ready:", {
+            senderNumber: activeNumber,
+            targetNumber: target,
+            message: msg,
+            hasMedia: media ? media.name : false,
+            scheduledDate: date || "Today",
+            scheduledTime: time || "Immediate"
+        });
+
+        alert(`सफलतापूर्वक लॉक हो गया! \nनंबर: ${activeNumber} के जरिए \nटारगेट: ${target} पर \nसमय: ${date ? date : 'आज'} - ${time ? time : 'तुरंत'} पर यह ट्रिगर हो जाएगा।`);
+        
+        // Reset fields
+        document.getElementById('wa-target').value = '';
+        document.getElementById('wa-message').value = '';
+        document.getElementById('wa-media').value = '';
+    }
+
+    // --- STEP 3: "ALL CHAT SEND" MULTI-LANGUAGE AI & DEMAND ENGINE ---
+    function handleKeyPress(e) {
+        if(e.key === 'Enter') {
+            sendAllChat();
+        }
+    }
+
+    async function sendAllChat() {
+        const inputField = document.getElementById('chat-input');
+        const text = inputField.value.trim();
+        if(!text) return;
+
+        const chatContainer = document.getElementById('chat-container');
+
+        // Append User Message
+        chatContainer.innerHTML += `<div class="message user">${text}</div>`;
+        inputField.value = '';
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        // Simulating Backend API & AI Processing (Multi-language handling)
+        // Here the app talks to backend API, processes the intent, and fetches the response back in user's language.
+        setTimeout(() => {
+            let aiResponse = "";
+            const lowerText = text.toLowerCase();
+
+            if(lowerText.includes('hello') || lowerText.includes('hi') || lowerText.includes('नमस्ते')) {
+                aiResponse = "नमस्ते पवन भाई! आपका 'MW' सिस्टम पूरी तरह से एक्टिव है। बताइए आज क्या डिमांड है?";
+            } else if(lowerText.includes('मराठी') || lowerText.includes('कसे')) {
+                aiResponse = "नमस्कार! मी तुमचा MW असिस्टंट आहे. मी तुम्हाला कशी मदत करू शकतो?";
+            } else if(lowerText.includes('ગુજરાતી') || lowerText.includes('કેમ')) {
+                aiResponse = "नमस्ते! हुं तमारो MW असिस्टंट छुं. तमे केम छो?";
+            } else {
+                aiResponse = `डिमैंड प्रोसेस हो गई: "${text}"। एपीआई (API) और ओएस (OS) ब्रिज के माध्यम से यह कमांड निष्पादित की जा रही है!`;
+            }
+
+            // Append AI Response to Chat Screen
+            chatContainer.innerHTML += `<div class="message ai">${aiResponse}</div>`;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }, 800);
+    }
+</script>
+
+</body>
+</html>
