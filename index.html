@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MW - Master WhatsApp Automation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        /* ========== LANDING PAGE ========== */
+        .landing-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1a2744 100%);
+            padding: 20px;
+        }
+
+        .landing-content {
+            text-align: center;
+            max-width: 500px;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .landing-logo {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .landing-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #f1f5f9;
+            letter-spacing: -0.5px;
+        }
+
+        .landing-subtitle {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            padding: 16px 48px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+        }
+
+        .download-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .download-btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .download-progress {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #1e293b;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* ========== TOAST NOTIFICATIONS ========== */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+            animation: slideInRight 0.4s ease;
+            z-index: 9999;
+            font-weight: 500;
+        }
+
+        .toast.error {
+            background: #ef4444;
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        .toast.warning {
+            background: #f59e0b;
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ========== AUTH SCREEN ========== */
+        .auth-container {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1a2744 100%);
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .auth-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .auth-subtitle {
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #ef4444;
+        }
+
+        .form-input::-webkit-outer-spin-button,
+        .form-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .form-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .phone-input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .country-code {
+            width: 60px;
+            padding: 12px 8px;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .phone-number-input {
+            flex: 1;
+        }
+
+        .auth-btn, .dashboard-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .auth-btn:hover, .dashboard-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .auth-btn:disabled, .dashboard-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .otp-input-group {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .otp-input {
+            width: 100%;
+            padding: 12px;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 1.2rem;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .otp-input.error {
+            border-color: #ef4444;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .otp-timer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .otp-timer.expiring {
+            color: #f59e0b;
+        }
+
+        .otp-timer.expired {
+            color: #ef4444;
+        }
+
+        .resend-otp-btn {
+            background: none;
+            border: none;
+            color: #3b82f6;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.9rem;
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        .resend-otp-btn:hover {
+            color: #60a5fa;
+        }
+
+        .resend-otp-btn:disabled {
+            color: #64748b;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        /* ========== DASHBOARD ========== */
+        .dashboard-container {
+            display: none;
+            min-height: 100vh;
+            background-color: #0f172a;
+            padding: 20px;
+            padding-top: 80px;
+        }
+
+        .dashboard-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .dashboard-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dashboard-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dashboard-user-info {
+            font-size: 0.85rem;
+            color: #cbd5e1;
+        }
+
+        .dashboard-user-info strong {
+            color: #f1f5f9;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .tabs-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #334155;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            bottom: -1px;
+        }
+
+        .tab-btn.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+
+        .tab-btn:hover {
+            color: #cbd5e1;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #334155;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 2px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .form-grid-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row > .form-group {
+            flex: 1;
+        }
+
+        .media-upload-area {
+            border: 2px dashed #334155;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #0f172a;
+        }
+
+        .media-upload-area:hover {
+            border-color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        .media-upload-area.dragover {
+            border-color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .media-upload-text {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        .media-upload-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .media-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .media-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            background-color: #0f172a;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+
+        .media-item img, .media-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-item-remove {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .media-input {
+            display: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-primary, .btn-secondary {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #334155;
+            color: #cbd5e1;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+
+        /* ========== CHAT INTERFACE ========== */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+            background: #1e293b;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 8px;
+            animation: slideUp 0.3s ease;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border-radius: 18px 18px 4px 18px;
+        }
+
+        .message.assistant .message-bubble {
+            background: #334155;
+            color: #e2e8f0;
+            border-radius: 18px 18px 18px 4px;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 4px;
+            margin-left: 8px;
+            margin-right: 8px;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid #334155;
+            background: #1e293b;
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 1rem;
+            resize: none;
+            max-height: 100px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .chat-send-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .chat-send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .chat-send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .chat-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #64748b;
+        }
+
+        .chat-empty-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #64748b;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-10px);
+            }
+        }
+
+        /* ========== MODAL ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.4s ease;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 16px;
+        }
+
+        .modal-text {
+            color: #cbd5e1;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.confirm {
+            background: #10b981;
+            color: white;
+        }
+
+        .modal-btn.confirm:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .modal-btn.cancel {
+            background: #334155;
+            color: #cbd5e1;
+        }
+
+        .modal-btn.cancel:hover {
+            background: #475569;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .landing-title {
+                font-size: 1.8rem;
+            }
+
+            .auth-card {
+                padding: 24px;
+            }
+
+            .form-grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .form-row > .form-group {
+                width: 100%;
+            }
+
+            .message-bubble {
+                max-width: 85%;
+            }
+
+            .tabs-container {
+                margin-bottom: 20px;
+            }
+
+            .tab-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+
+            .chat-container {
+                height: 500px;
+            }
+
+            .dashboard-header {
+                flex-wrap: wrap;
+            }
+
+            .dashboard-header-left {
+                flex: 1;
+            }
+
+            .logout-btn {
+                flex: 1;
+            }
+        }
+
+        /* ========== SCROLLBAR ========== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body>
+    <!-- ========== LANDING PAGE ========== -->
+    <div class="landing-container" id="landingPage">
+        <div class="landing-content">
+            <div class="landing-logo">MW</div>
+            <h1 class="landing-title">Welcome to MW</h1>
+            <p class="landing-subtitle">Master WhatsApp Automation Platform - Schedule messages, send bulk communications, and automate your WhatsApp workflow instantly.</p>
+            
+            <button class="download-btn" id="downloadBtn">📥 Download (~15MB)</button>
+            
+            <div class="download-progress" id="downloadProgress">
+                <div style="color: #94a3b8; font-size: 0.9rem;" id="downloadText">Preparing download...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== AUTH PAGE ========== -->
+    <div class="auth-container" id="authPage">
+        <div class="auth-card">
+            <h1 class="auth-title">Verify Your Account</h1>
+            <p class="auth-subtitle">Enter your 10-digit mobile number to continue</p>
+
+            <div id="phoneInputSection">
+                <div class="form-group">
+                    <label class="form-label">Mobile Number</label>
+                    <div class="phone-input-group">
+                        <div class="country-code">+91</div>
+                        <input 
+                            type="number" 
+                            class="form-input phone-number-input" 
+                            id="phoneInput" 
+                            placeholder="10-digit number" 
+                            maxlength="10"
+                            min="0"
+                        >
+                    </div>
+                </div>
+                <button class="auth-btn" id="sendOtpBtn">Send OTP</button>
+            </div>
+
+            <div id="otpVerifySection" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Enter 4-Digit OTP</label>
+                    <div class="otp-input-group" id="otpInputGroup">
+                        <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+                        <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+                        <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+                        <input type="text" class="otp-input" maxlength="1" inputmode="numeric">
+                    </div>
+                </div>
+                <div class="otp-timer" id="otpTimer">OTP expires in: <span id="otpTime">60</span>s</div>
+                <button class="auth-btn" id="verifyOtpBtn">Verify OTP</button>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="resend-otp-btn" id="resendOtpBtn" disabled>Resend OTP</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== DASHBOARD ========== -->
+    <div class="dashboard-container" id="dashboardPage">
+        <!-- HEADER -->
+        <div class="dashboard-header">
+            <div class="dashboard-header-left">
+                <div class="dashboard-logo">MW</div>
+                <div class="dashboard-user-info">
+                    Logged in as <strong id="userPhoneDisplay">+91 XXXXXXXXXX</strong>
+                </div>
+            </div>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs-container">
+            <button class="tab-btn active" data-tab="whatsapp-tab">📱 WhatsApp Scheduler</button>
+            <button class="tab-btn" data-tab="chat-tab">💬 AI Chat Assistant</button>
+        </div>
+
+        <!-- TAB 1: WHATSAPP SCHEDULER -->
+        <div class="tab-content active" id="whatsapp-tab">
+            <div class="card">
+                <h3 class="card-title">Schedule WhatsApp Message</h3>
+                
+                <div class="form-grid form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Target WhatsApp Number</label>
+                        <input 
+                            type="tel" 
+                            class="form-input" 
+                            id="targetPhone" 
+                            placeholder="10-digit number or full with +91" 
+                        >
+                        <small style="color: #64748b; display: block; margin-top: 4px;">Enter recipient's 10-digit mobile number</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Message Subject (Optional)</label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            id="messageSubject" 
+                            placeholder="Message title or subject" 
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Message Text</label>
+                    <textarea 
+                        class="form-input" 
+                        id="messageText" 
+                        placeholder="Enter your message here... (supports multiple languages: English, Hindi, Marathi, Gujarati, etc.)" 
+                        rows="5"
+                        style="resize: vertical; min-height: 120px;"
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Attach Media (Optional)</label>
+                    <div class="media-upload-area" id="mediaUploadArea">
+                        <div class="media-upload-icon">📸</div>
+                        <div class="media-upload-text">Click or drag media files here<br><small>Photos, Videos, Documents</small></div>
+                    </div>
+                    <input type="file" class="media-input" id="mediaInput" multiple>
+                    <div class="media-preview" id="mediaPreview"></div>
+                </div>
+
+                <div class="form-grid form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Schedule Date</label>
+                        <input 
+                            type="date" 
+                            class="form-input" 
+                            id="scheduleDate" 
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Schedule Time</label>
+                        <input 
+                            type="time" 
+                            class="form-input" 
+                            id="scheduleTime" 
+                        >
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" id="confirmScheduleBtn">✅ Confirm & Schedule</button>
+                    <button class="btn-secondary" id="resetScheduleBtn">🔄 Reset</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Scheduled Messages</h3>
+                <div id="scheduledMessagesList" style="color: #94a3b8; text-align: center; padding: 20px;">
+                    No scheduled messages yet.
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: AI CHAT ASSISTANT -->
+        <div class="tab-content" id="chat-tab">
+            <div class="card">
+                <h3 class="card-title">AI Chat Assistant (Multi-Language)</h3>
+                
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-empty">
+                            <div class="chat-empty-icon">💬</div>
+                            <div>No messages yet. Start a conversation!</div>
+                            <small style="color: #64748b; margin-top: 10px;">You can chat in English, Hindi, Marathi, Gujarati, and more...</small>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <textarea 
+                            class="chat-input" 
+                            id="chatInput" 
+                            placeholder="Ask me anything... (हिंदी में भी बोल सकते हो)" 
+                            rows="1"
+                        ></textarea>
+                        <button class="chat-send-btn" id="chatSendBtn">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODALS ========== -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modalTitle">Confirm Action</h2>
+            <p class="modal-text" id="modalText">Are you sure?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn confirm" id="modalConfirmBtn">Confirm</button>
+                <button class="modal-btn cancel" id="modalCancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== STATE MANAGEMENT ====================
+        const STATE = {
+            currentScreen: 'landing',
+            userPhone: null,
+            generatedOtp: null,
+            otpTimer: null,
+            whatsappActive: false,
+            scheduledMessages: [],
+            chatHistory: []
+        };
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.4s ease reverse';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        function formatPhoneNumber(phone) {
+            const cleaned = phone.replace(/\D/g, '');
+            if (cleaned.length === 10) {
+                return `+91${cleaned}`;
+            } else if (cleaned.length === 12 && cleaned.startsWith('91')) {
+                return `+${cleaned}`;
+            }
+            return phone;
+        }
+
+        function getCurrentDateTime() {
+            return new Date().toLocaleString('en-IN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        // ==================== DOWNLOAD SIMULATION ====================
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            const btn = this;
+            btn.disabled = true;
+            btn.classList.add('loading');
+            
+            const progress = document.getElementById('downloadProgress');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('downloadText');
+            
+            progress.style.display = 'block';
+            
+            let currentProgress = 0;
+            const interval = setInterval(() => {
+                currentProgress += Math.random() * 30;
+                if (currentProgress > 90) currentProgress = 90;
+                progressFill.style.width = currentProgress + '%';
+                progressText.textContent = `Downloading... ${Math.round(currentProgress)}%`;
+                
+                if (currentProgress >= 90) {
+                    clearInterval(interval);
+                    
+                    setTimeout(() => {
+                        // Simulate APK package creation
+                        const mockApkData = new Uint8Array(15728640); // ~15MB
+                        for (let i = 0; i < mockApkData.length; i += 1000) {
+                            mockApkData[i] = Math.floor(Math.random() * 256);
+                        }
+                        
+                        const blob = new Blob([mockApkData], {
+                            type: 'application/vnd.android.package-archive'
+                        });
+                        const url = URL.createObjectURL(blob);
+                        
+                        // Trigger download
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'MW_App.apk';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        
+                        URL.revokeObjectURL(url);
+                        
+                        progressFill.style.width = '100%';
+                        progressText.textContent = '✅ Download Complete! Open file to install.';
+                        
+                        showToast('✅ APK Downloaded Successfully! Open file manager and install the app.', 'success');
+                        
+                        setTimeout(() => {
+                            btn.disabled = false;
+                            btn.classList.remove('loading');
+                            progress.style.display = 'none';
+                            progressFill.style.width = '0%';
+                        }, 2000);
+                    }, 500);
+                }
+            }, 300);
+        });
+
+        // ==================== AUTHENTICATION FLOW ====================
+        document.getElementById('downloadBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            // Original download logic above
+        });
+
+        // Simulate app installation and screen transition
+        setTimeout(() => {
+            if (!localStorage.getItem('mwUserPhone')) {
+                // First time user - show auth after download
+                const showAuthAfterDownload = () => {
+                    // This would be triggered in real scenario when app is installed
+                };
+            }
+        }, 1000);
+
+        document.getElementById('sendOtpBtn').addEventListener('click', function() {
+            const phone = document.getElementById('phoneInput').value.trim();
+            
+            if (!phone || phone.length !== 10) {
+                showToast('❌ Please enter a valid 10-digit number', 'error');
+                document.getElementById('phoneInput').classList.add('error');
+                return;
+            }
+
+            if (!/^\d{10}$/.test(phone)) {
+                showToast('❌ Only numbers allowed', 'error');
+                return;
+            }
+
+            document.getElementById('phoneInput').classList.remove('error');
+            
+            // Generate 4-digit OTP
+            STATE.generatedOtp = String(Math.floor(1000 + Math.random() * 9000));
+            STATE.userPhone = phone;
+            
+            // Show OTP verification section
+            document.getElementById('phoneInputSection').style.display = 'none';
+            document.getElementById('otpVerifySection').style.display = 'block';
+            
+            showToast(`📨 OTP: ${STATE.generatedOtp} (For demo purposes)`, 'warning');
+            
+            // Start OTP timer
+            startOtpTimer();
+        });
+
+        function startOtpTimer() {
+            let timeLeft = 60;
+            document.getElementById('otpTime').textContent = timeLeft;
+            
+            STATE.otpTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('otpTime').textContent = timeLeft;
+                
+                const timerElement = document.getElementById('otpTimer');
+                if (timeLeft <= 10) {
+                    timerElement.classList.add('expiring');
+                    document.getElementById('resendOtpBtn').disabled = false;
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(STATE.otpTimer);
+                    timerElement.classList.add('expired');
+                    timerElement.innerHTML = 'OTP Expired! <button class="resend-otp-btn" id="resendOtpBtn" style="margin-left: 8px;">Resend</button>';
+                    document.querySelectorAll('.otp-input').forEach(input => {
+                        input.disabled = true;
+                        input.classList.add('error');
+                    });
+                }
+            }, 1000);
+        }
+
+        // OTP input auto-advance
+        document.querySelectorAll('.otp-input').forEach((input, index) => {
+            input.addEventListener('input', function() {
+                if (this.value.length === 1 && index < 3) {
+                    document.querySelectorAll('.otp-input')[index + 1].focus();
+                }
+                if (this.value.length === 0 && index > 0 && event.inputType === 'deleteContentBackward') {
+                    document.querySelectorAll('.otp-input')[index - 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (!/[0-9]/.test(e.key) && !['Backspace', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        document.getElementById('verifyOtpBtn').addEventListener('click', function() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            const enteredOtp = Array.from(otpInputs).map(input => input.value).join('');
+            
+            if (enteredOtp.length !== 4) {
+                showToast('❌ Please enter complete 4-digit OTP', 'error');
+                otpInputs.forEach(input => input.classList.add('error'));
+                return;
+            }
+            
+            if (enteredOtp !== STATE.generatedOtp) {
+                showToast('❌ Wrong OTP. Try again!', 'error');
+                otpInputs.forEach(input => {
+                    input.value = '';
+                    input.classList.add('error');
+                });
+                otpInputs[0].focus();
+                return;
+            }
+            
+            // OTP verified successfully
+            clearInterval(STATE.otpTimer);
+            localStorage.setItem('mwUserPhone', formatPhoneNumber(STATE.userPhone));
+            localStorage.setItem('mwAuthToken', 'authenticated_' + Date.now());
+            
+            showToast('✅ Authentication Successful!', 'success');
+            
+            setTimeout(() => {
+                loadDashboard();
+            }, 500);
+        });
+
+        document.getElementById('resendOtpBtn').addEventListener('click', function() {
+            if (this.disabled) return;
+            
+            clearInterval(STATE.otpTimer);
+            document.getElementById('otpTimer').classList.remove('expiring', 'expired');
+            document.querySelectorAll('.otp-input').forEach(input => {
+                input.value = '';
+                input.disabled = false;
+                input.classList.remove('error');
+            });
+            
+            STATE.generatedOtp = String(Math.floor(1000 + Math.random() * 9000));
+            showToast(`📨 New OTP: ${STATE.generatedOtp}`, 'warning');
+            startOtpTimer();
+        });
+
+        // ==================== DASHBOARD LOGIC ====================
+        function loadDashboard() {
+            STATE.currentScreen = 'dashboard';
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('authPage').style.display = 'none';
+            document.getElementById('dashboardPage').style.display = 'block';
+            
+            const userPhone = localStorage.getItem('mwUserPhone');
+            document.getElementById('userPhoneDisplay').textContent = userPhone;
+            
+            // Simulate WhatsApp check
+            STATE.whatsappActive = Math.random() > 0.3; // 70% chance WhatsApp is active
+            if (STATE.whatsappActive) {
+                showToast('✅ WhatsApp connection verified!', 'success');
+            } else {
+                showToast('⚠️ WhatsApp not detected. Some features may be limited.', 'warning');
+            }
+        }
+
+        // Check if user is already authenticated
+        window.addEventListener('load', function() {
+            if (localStorage.getItem('mwAuthToken')) {
+                loadDashboard();
+            }
+        });
+
+        // ==================== WHATSAPP SCHEDULER ====================
+        // Media upload
+        const mediaUploadArea = document.getElementById('mediaUploadArea');
+        const mediaInput = document.getElementById('mediaInput');
+
+        mediaUploadArea.addEventListener('click', () => mediaInput.click());
+
+        mediaUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            mediaUploadArea.classList.add('dragover');
+        });
+
+        mediaUploadArea.addEventListener('dragleave', () => {
+            mediaUploadArea.classList.remove('dragover');
+        });
+
+        mediaUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            mediaUploadArea.classList.remove('dragover');
+            handleMediaFiles(e.dataTransfer.files);
+        });
+
+        mediaInput.addEventListener('change', (e) => {
+            handleMediaFiles(e.target.files);
+        });
+
+        function handleMediaFiles(files) {
+            const preview = document.getElementById('mediaPreview');
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'application/pdf', 'application/msword'];
+            
+            Array.from(files).forEach((file, index) => {
+                if (allowedTypes.some(type => file.type.startsWith(type.split('/')[0]))) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = (e) => {
+                        const item = document.createElement('div');
+                        item.className = 'media-item';
+                        item.dataset.index = index;
+                        
+                        if (file.type.startsWith('image/')) {
+                            item.innerHTML = `<img src="${e.target.result}" alt="media">`;
+                        } else if (file.type.startsWith('video/')) {
+                            item.innerHTML = `<video src="${e.target.result}"></video>`;
+                        } else {
+                            item.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 2rem;">📄</div>`;
+                        }
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.className = 'media-item-remove';
+                        removeBtn.textContent = '×';
+                        removeBtn.addEventListener('click', () => item.remove());
+                        
+                        item.appendChild(removeBtn);
+                        preview.appendChild(item);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                } else {
+                    showToast('❌ File type not supported', 'error');
+                }
+            });
+        }
+
+        // Schedule date - set minimum to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('scheduleDate').setAttribute('min', today);
+
+        // Reset button
+        document.getElementById('resetScheduleBtn').addEventListener('click', function() {
+            document.getElementById('targetPhone').value = '';
+            document.getElementById('messageSubject').value = '';
+            document.getElementById('messageText').value = '';
+            document.getElementById('scheduleDate').value = '';
+            document.getElementById('scheduleTime').value = '';
+            document.getElementById('mediaPreview').innerHTML = '';
+            document.getElementById('mediaInput').value = '';
+        });
+
+        // Confirm schedule
+        document.getElementById('confirmScheduleBtn').addEventListener('click', function() {
+            const targetPhone = document.getElementById('targetPhone').value.trim();
+            const messageSubject = document.getElementById('messageSubject').value.trim();
+            const messageText = document.getElementById('messageText').value.trim();
+            const scheduleDate = document.getElementById('scheduleDate').value;
+            const scheduleTime = document.getElementById('scheduleTime').value;
+            const mediaItems = document.querySelectorAll('.media-item').length;
+            
+            if (!targetPhone) {
+                showToast('❌ Please enter target phone number', 'error');
+                return;
+            }
+            
+            if (!messageText) {
+                showToast('❌ Please enter message text', 'error');
+                return;
+            }
+            
+            if (!scheduleDate || !scheduleTime) {
+                showToast('❌ Please select date and time', 'error');
+                return;
+            }
+            
+            const scheduledMessage = {
+                id: 'msg_' + Date.now(),
+                targetPhone: formatPhoneNumber(targetPhone),
+                subject: messageSubject || 'No Subject',
+                message: messageText,
+                media: mediaItems,
+                scheduledAt: `${scheduleDate} ${scheduleTime}`,
+                status: 'Scheduled',
+                createdAt: getCurrentDateTime()
+            };
+            
+            STATE.scheduledMessages.push(scheduledMessage);
+            localStorage.setItem('mwScheduledMessages', JSON.stringify(STATE.scheduledMessages));
+            
+            showToast('✅ Message scheduled successfully!', 'success');
+            
+            // Update scheduled messages list
+            updateScheduledMessagesList();
+            
+            // Reset form
+            document.getElementById('resetScheduleBtn').click();
+        });
+
+        function updateScheduledMessagesList() {
+            const list = document.getElementById('scheduledMessagesList');
+            
+            if (STATE.scheduledMessages.length === 0) {
+                list.innerHTML = '<div style="color: #94a3b8; text-align: center; padding: 20px;">No scheduled messages yet.</div>';
+                return;
+            }
+            
+            let html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
+            
+            STATE.scheduledMessages.forEach((msg, index) => {
+                html += `
+                    <div style="background: #0f172a; padding: 16px; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <div>
+                                <strong style="color: #f1f5f9;">To: ${msg.targetPhone}</strong><br>
+                                <small style="color: #64748b;">Scheduled: ${msg.scheduledAt}</small>
+                            </div>
+                            <span style="background: #10b981; color: white; padding: 4px 12px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">${msg.status}</span>
+                        </div>
+                        <div style="color: #cbd5e1; margin-bottom: 8px; word-break: break-word;">${msg.message.substring(0, 100)}${msg.message.length > 100 ? '...' : ''}</div>
+                        ${msg.media > 0 ? `<small style="color: #60a5fa;">📎 ${msg.media} media file(s)</small>` : ''}
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            list.innerHTML = html;
+        }
+
+        // Load scheduled messages from localStorage
+        const savedMessages = localStorage.getItem('mwScheduledMessages');
+        if (savedMessages) {
+            STATE.scheduledMessages = JSON.parse(savedMessages);
+            updateScheduledMessagesList();
+        }
+
+        // ==================== AI CHAT INTERFACE ====================
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const chatSendBtn = document.getElementById('chatSendBtn');
+
+        // Auto-resize textarea
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+
+        function addMessageToChat(text, isUser = true) {
+            if (chatMessages.querySelector('.chat-empty')) {
+                chatMessages.innerHTML = '';
+            }
+
+            const message = document.createElement('div');
+            message.className = `message ${isUser ? 'user' : 'assistant'}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.textContent = text;
+            
+            message.appendChild(bubble);
+            
+            const time = document.createElement('div');
+            time.className = 'message-time';
+            time.textContent = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            message.appendChild(time);
+            
+            chatMessages.appendChild(message);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function simulateApiResponse(userMessage) {
+            const responses = {
+                'hello': 'नमस्ते! मैं MW AI असिस्टेंट हूँ। आपकी कैसे सहायता कर सकता हूँ? / Hi! I\'m MW AI Assistant. How can I help you?',
+                'help': 'मैं आपको WhatsApp messages schedule करने, bulk communications भेजने, और automation tasks में help कर सकता हूँ। / I can help you schedule WhatsApp messages, send bulk communications, and automate tasks.',
+                'schedule': 'WhatsApp messages schedule करने के लिए Tab 1 (WhatsApp Scheduler) पर जाएं। / To schedule WhatsApp messages, go to Tab 1 (WhatsApp Scheduler).',
+                'features': '🌟 मेरी सुविधाएं: 1) WhatsApp Message Scheduling 2) Bulk Message Broadcasting 3) Multi-language Support 4) Media Sharing 5) Automated Responses',
+                'price': 'हमारी pricing के लिए https://mw.app/pricing देखें। / Check https://mw.app/pricing for our pricing details.',
+                'support': 'Support के लिए contact@mw.app पर ईमेल करें या +91-XXXXXXXXXX पर कॉल करें। / Email us at contact@mw.app or call +91-XXXXXXXXXX',
+                'hindi': 'आप हिंदी में भी बात कर सकते हैं! मुझे सभी भारतीय भाषाएं समझ आती हैं। / You can chat in Hindi! I understand all Indian languages.',
+                'marathi': 'मराठी में देखील बोलू शकता! मला सर्व भारतीय भाषा समजतात। / I can chat in Marathi too! I understand all Indian languages.',
+                'gujarati': 'હું ગુજરાતીમાં પણ વાત કરી શકું! મને બધી ભારતીય ભાષાઓ સમજાય છે। / I can chat in Gujarati too! I understand all Indian languages.'
+            };
+
+            const lowerMessage = userMessage.toLowerCase().trim();
+            
+            for (const [key, response] of Object.entries(responses)) {
+                if (lowerMessage.includes(key)) {
+                    return response;
+                }
+            }
+
+            // Default response for unrecognized queries
+            return `Thanks for your message: "${userMessage}".\n\nType 'help' to see what I can do, or ask me anything in English, Hindi, Marathi, Gujarati, or any other Indian language!\n\n📝 Suggestion: Use Tab 1 to schedule your WhatsApp messages directly.`;
+        }
+
+        chatSendBtn.addEventListener('click', sendChatMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+
+        function sendChatMessage() {
+            const message = chatInput.value.trim();
+            
+            if (!message) {
+                showToast('❌ Please type a message', 'error');
+                return;
+            }
+
+            // Add user message
+            addMessageToChat(message, true);
+            STATE.chatHistory.push({ role: 'user', message, timestamp: getCurrentDateTime() });
+            
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            chatSendBtn.disabled = true;
+
+            // Show typing indicator
+            const typingMessage = document.createElement('div');
+            typingMessage.className = 'message assistant';
+            typingMessage.innerHTML = '<div class="message-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';
+            chatMessages.appendChild(typingMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Simulate API response delay
+            setTimeout(() => {
+                typingMessage.remove();
+                const response = simulateApiResponse(message);
+                addMessageToChat(response, false);
+                STATE.chatHistory.push({ role: 'assistant', message: response, timestamp: getCurrentDateTime() });
+                chatSendBtn.disabled = false;
+            }, 800 + Math.random() * 400);
+        }
+
+        // ==================== TAB SWITCHING ====================
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabId = this.dataset.tab;
+                
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // ==================== LOGOUT ====================
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            const modal = document.getElementById('confirmModal');
+            document.getElementById('modalTitle').textContent = 'Confirm Logout';
+            document.getElementById('modalText').textContent = 'Are you sure you want to logout? You\'ll need to enter OTP again to login.';
+            modal.classList.add('active');
+
+            document.getElementById('modalConfirmBtn').onclick = function() {
+                localStorage.removeItem('mwAuthToken');
+                modal.classList.remove('active');
+                
+                STATE.currentScreen = 'landing';
+                document.getElementById('dashboardPage').style.display = 'none';
+                document.getElementById('landingPage').style.display = 'flex';
+                
+                // Reset form
+                document.getElementById('phoneInput').value = '';
+                document.getElementById('phoneInputSection').style.display = 'block';
+                document.getElementById('otpVerifySection').style.display = 'none';
+                document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+                
+                showToast('✅ Logged out successfully', 'success');
+            };
+
+            document.getElementById('modalCancelBtn').onclick = function() {
+                modal.classList.remove('active');
+            };
+        });
+
+        // ==================== INITIALIZATION ====================
+        console.log('%c🚀 MW APP INITIALIZED', 'color: #3b82f6; font-size: 16px; font-weight: bold;');
+        console.log('%cLanding → Authentication → Dashboard', 'color: #60a5fa; font-size: 12px;');
+    </script>
+</body>
+</html>
